@@ -748,11 +748,11 @@ function submitOrder() {
     if (url && url !== 'YOUR_GOOGLE_APPS_SCRIPT_URL') {
       return fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify(payload)
       });
     }
-    // If no backend yet, simulate success
     return new Promise(res => setTimeout(res, 800));
   };
 
