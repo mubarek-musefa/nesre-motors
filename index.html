@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>ነስሬ ሞተርስ - ትዕዛዝ</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --primary: #E65100;
+    --primary-dark: #BF360C;
+    --primary-light: #FFF3E0;
+    --accent: #FF8F00;
+    --bg: #F5F5F5;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --text-muted: #757575;
+    --border: #E0E0E0;
+    --success: #2E7D32;
+    --input-bg: #FAFAFA;
+    --header-h: 64px;
+    --footer-h: 80px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Noto Sans Ethiopic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    min-height: 100vh;
+    padding-bottom: calc(var(--footer-h) + 16px);
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--primary);
+    color: #fff;
+    padding: 0 16px;
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .header-icon {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+  }
+  .header-text h1 { font-size: 16px; font-weight: 700; }
+  .header-text p { font-size: 11px; opacity: 0.85; margin-top: 1px; }
+
+  /* CUSTOMER INFO */
+  .section-card {
+    background: var(--card);
+    margin: 12px 12px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .section-title {
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .customer-fields { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .field-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+  .field-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--input-bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .field-input:focus { border-color: var(--primary); }
+
+  /* CATEGORY */
+  .category-block {
+    background: var(--card);
+    margin: 10px 12px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--primary-light);
+    border-left: 4px solid var(--primary);
+  }
+  .category-header-left { display: flex; align-items: center; gap: 10px; }
+  .category-header h3 { font-size: 13px; font-weight: 700; color: var(--primary-dark); }
+  .category-header .count {
+    font-size: 11px;
+    background: var(--primary);
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .chevron {
+    width: 20px; height: 20px;
+    border-right: 2.5px solid var(--primary);
+    border-bottom: 2.5px solid var(--primary);
+    transform: rotate(45deg);
+    transition: transform 0.25s;
+    flex-shrink: 0;
+    margin-right: 4px;
+  }
+  .chevron.open { transform: rotate(-135deg); }
+  .category-body { display: none; }
+  .category-body.open { display: block; }
+
+  /* MODEL GROUP */
+  .model-group { border-top: 1px solid var(--border); }
+  .model-label {
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: #FAFAFA;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* PRODUCT ROW */
+  .product-row {
+    display: flex;
+    align-items: center;
+    padding: 9px 14px;
+    border-top: 1px solid var(--border);
+    gap: 8px;
+    transition: background 0.15s;
+  }
+  .product-row:hover { background: #FFFBF7; }
+  .product-row.has-qty { background: #FFF8F0; }
+  .product-num {
+    font-size: 10px;
+    color: var(--text-muted);
+    min-width: 22px;
+    font-weight: 600;
+  }
+  .product-info { flex: 1; min-width: 0; }
+  .product-name { font-size: 13px; font-weight: 600; line-height: 1.3; }
+  .product-price { font-size: 11px; color: var(--primary); font-weight: 600; margin-top: 2px; }
+  .product-model-tag {
+    font-size: 10px;
+    color: var(--text-muted);
+    background: #F0F0F0;
+    padding: 1px 5px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 2px;
+  }
+
+  /* QTY CONTROL */
+  .qty-control { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .qty-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--border);
+    color: var(--text);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+  }
+  .qty-btn:active { transform: scale(0.88); }
+  .qty-btn.plus { background: var(--primary); color: #fff; }
+  .qty-btn.minus { background: #EEE; }
+  .qty-input {
+    width: 36px;
+    text-align: center;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 2px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    background: #fff;
+    outline: none;
+  }
+  .qty-input:focus { border-color: var(--primary); }
+
+  /* FOOTER */
+  .footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--footer-h);
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 12px;
+    z-index: 100;
+    box-shadow: 0 -3px 12px rgba(0,0,0,0.1);
+  }
+  .total-block { flex: 1; }
+  .total-label { font-size: 11px; color: var(--text-muted); }
+  .total-amount { font-size: 20px; font-weight: 700; color: var(--primary-dark); }
+  .submit-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 22px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .submit-btn:active { transform: scale(0.96); background: var(--primary-dark); }
+  .submit-btn:disabled { background: #CCC; cursor: not-allowed; }
+
+  /* EMPTY STATE */
+  .empty-notice {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+    background: #333;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 200;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* SUCCESS */
+  .success-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 300;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s;
+  }
+  .success-overlay.show { opacity: 1; pointer-events: all; }
+  .success-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px 24px;
+    margin: 20px;
+    text-align: center;
+    transform: scale(0.8); transition: transform 0.3s;
+  }
+  .success-overlay.show .success-card { transform: scale(1); }
+  .success-icon { font-size: 52px; margin-bottom: 12px; }
+  .success-card h2 { font-size: 18px; color: var(--success); margin-bottom: 8px; }
+  .success-card p { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+
+  .bottom-space { height: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">🏍️</div>
+  <div class="header-text">
+    <h1>ነስሬ ሞተርስ</h1>
+    <p>NESRE MOTORS — የትዕዛዝ ቅጽ</p>
+  </div>
+</div>
+
+<!-- Customer Info -->
+<div class="section-card">
+  <div class="section-title">👤 የደንበኛ መረጃ</div>
+  <div class="customer-fields">
+    <div>
+      <div class="field-label">ሙሉ ስም *</div>
+      <input class="field-input" type="text" id="cust-name" placeholder="ስምዎን ያስገቡ"/>
+    </div>
+    <div>
+      <div class="field-label">ስልክ ቁጥር *</div>
+      <input class="field-input" type="tel" id="cust-phone" placeholder="09XXXXXXXX"/>
+    </div>
+  </div>
+</div>
+
+<div id="products-container"></div>
+<div class="bottom-space"></div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="total-block">
+    <div class="total-label">ጠቅላላ ዋጋ</div>
+    <div class="total-amount" id="grand-total">0 ብር</div>
+  </div>
+  <button class="submit-btn" id="submit-btn" onclick="submitOrder()">📤 ትዕዛዝ ላክ</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Success -->
+<div class="success-overlay" id="success-overlay">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h2>ትዕዛዝዎ ተልኳል!</h2>
+    <p id="success-msg">ትዕዛዝዎ በስኬት ደርሷል።<br/>በቅርቡ እናነጋግርዎታለን።</p>
+  </div>
+</div>
+
+<script>
+// ─── PRODUCT DATA ───────────────────────────────────────────────
+const CATEGORIES = [
+  {
+    name: "የ 2 እግር እቃዎች በ Ocelot Brand",
+    items: [
+      { id:1,  model:"BM 150", name:"ነዳጅ ግሪፕ",              price:130  },
+      { id:2,  model:"BM 150", name:"ፍሬቻ",                   price:195  },
+      { id:3,  model:"BM 150", name:"ፍሬን ሸራ",               price:370  },
+      { id:4,  model:"BM 150", name:"ፍሬን ዘንግ",              price:150  },
+      { id:5,  model:"BM 150", name:"ፓውዛ አምፖል",            price:170  },
+      { id:6,  model:"BM 150", name:"ሞተሪኖ ከሰል",            price:220  },
+      { id:7,  model:"BM 150", name:"ጋስኬት ሙሉ",             price:200  },
+      { id:8,  model:"BM 150", name:"ማንሸራተቻ",               price:280  },
+      { id:9,  model:"BM 150", name:"ማስነሻ ስፕሪንግ",          price:80   },
+      { id:10, model:"BM 150", name:"መሪ ጠጠር",               price:450  },
+      { id:11, model:"BM 150", name:"ካንዴላ",                  price:140  },
+      { id:12, model:"BM 150", name:"ስፖኪዮ",                  price:620  },
+      { id:13, model:"BM 150", name:"የውጭ ማርሽ",              price:290  },
+      { id:14, model:"BM 150", name:"የወገብ ሻንሲ አክስ",         price:260  },
+      { id:15, model:"BM 150", name:"አሞዝራተር ሲል",           price:150  },
+      { id:16, model:"BM 150", name:"አንፖል ማቀፊያ",           price:120  },
+      { id:17, model:"BM 150", name:"ታይሚንግ ቼን",            price:400  },
+      { id:18, model:"BM 150", name:"ሪዘርቭ",                  price:420  },
+      { id:19, model:"BM 150", name:"ፒስተን (std +)",          price:1000 },
+      { id:20, model:"BM 150", name:"ፒስተን (std ++)",         price:1000 },
+      { id:21, model:"BM 150", name:"ቫልቭ",                   price:380  },
+      { id:22, model:"BM 150", name:"ፍሪሲዮን ሸራ",            price:480  },
+      { id:23, model:"BM 150", name:"መርገጫ ጎሚኒ",            price:200  },
+      { id:24, model:"BM 150", name:"ፉት ሬስት ሙሉ",           price:1000 },
+      { id:25, model:"BM 150", name:"የፊት አክስ",               price:240  },
+      { id:26, model:"BM 150", name:"የፊት ስፕሮኬት ከነ ፌርሞ",   price:240  },
+      { id:27, model:"BM 150", name:"ሪሌ",                    price:700  },
+      { id:28, model:"BM 150", name:"ፍላሸር",                  price:220  },
+      { id:29, model:"BM 150", name:"ፊልትሮ",                  price:150  },
+      { id:30, model:"BM 150", name:"27 ብሎን",               price:160  },
+      { id:31, model:"BM 150", name:"ስፕሮኬት ሙሉ",            price:2150 },
+      { id:32, model:"BM 150", name:"ታምቡር ጎሚኒ",           price:220  },
+      { id:33, model:"BM 150", name:"ዘይት ታፖ",               price:75   },
+      { id:34, model:"5 ማርሽ",  name:"የውጭ ማርሽ",             price:320  },
+      { id:35, model:"5 ማርሽ",  name:"የውስጥ ማርሽ",            price:380  },
+      { id:36, model:"5 ማርሽ",  name:"ፓውዛ ከቨር ከነቫይዘሩ ቀይ",  price:1400 },
+      { id:37, model:"5 ማርሽ",  name:"ሞተሪኖ ከሰል",            price:220  },
+      { id:38, model:"ኦልድ",    name:"ጋስኬት ሙሉ",             price:200  },
+      { id:39, model:"ኦልድ",    name:"ዶግላ",                   price:220  },
+      { id:40, model:"ኦልድ",    name:"ስፕሮኬት ሙሉ",            price:2150 },
+      { id:41, model:"ኦልድ",    name:"ፍሬን ዘንግ",              price:150  },
+      { id:42, model:"ኦልድ",    name:"ማንሸራተቻ",               price:280  },
+      { id:43, model:"ኦልድ",    name:"ፍሪሲዮን ሸራ",            price:480  },
+      { id:44, model:"ኦልድ",    name:"መሪ",                    price:750  },
+      { id:45, model:"ኦልድ",    name:"አሞዝራተር ሲል",           price:150  },
+      { id:46, model:"ኦልድ",    name:"ሪዘርቭ",                  price:420  },
+      { id:47, model:"ኦልድ",    name:"ቫልቭ",                   price:380  },
+      { id:48, model:"ኦልድ",    name:"ታንቡር ጎሚኒ",            price:180  },
+      { id:49, model:"ኦልድ",    name:"ካቴና",                   price:940  },
+      { id:50, model:"TVS",     name:"ካንዴላ",                  price:150  },
+      { id:51, model:"HLX 125", name:"ነዳጅ ግሪፕ",              price:150  },
+      { id:52, model:"HLX 125", name:"ፍሬን ዘንግ",              price:150  },
+      { id:53, model:"HLX 125", name:"ሞተሪኖ ከሰል",            price:250  },
+      { id:54, model:"HLX 125", name:"ማንሸራተቻ",               price:280  },
+      { id:55, model:"HLX 125", name:"መሪ ጠጠር",               price:400  },
+      { id:56, model:"HLX 125", name:"ፍሪሲዮን ሸራ",            price:480  },
+      { id:57, model:"HLX 125", name:"ኮይል",                   price:1900 },
+      { id:58, model:"HLX 125", name:"ፋሻ",                    price:350  },
+      { id:59, model:"HLX 125", name:"ስፕሮኬት ሙሉ ጥቁር",       price:2150 },
+      { id:60, model:"HLX 125", name:"ስፕሮኬት ሙሉ",            price:2150 },
+      { id:61, model:"HLX 125", name:"ታምቡር ጎሚኒ",           price:220  },
+      { id:62, model:"HLX 125", name:"ፍሬን ፔዳል",              price:450  },
+      { id:63, model:"HLX 125", name:"ካምቻ ቴንሽነር",           price:500  },
+      { id:64, model:"HLX 125", name:"ፍሬቻ",                   price:195  },
+      { id:65, model:"HLX 125", name:"የውጭ ማርሽ",              price:290  },
+      { id:66, model:"HLX 125", name:"ዶግላ",                   price:270  },
+      { id:67, model:"HLX 125", name:"ዘይት ታፖ",               price:90   },
+      { id:68, model:"HLX 125", name:"ጋስኬት ሙሉ",             price:200  },
+      { id:69, model:"HLX 125", name:"የውስጥ ማርሽ",            price:380  },
+      { id:70, model:"HLX 125", name:"መሪ",                    price:750  },
+      { id:71, model:"HLX 125", name:"መርገጫ ጎሚኒ",            price:190  },
+      { id:72, model:"HLX 125", name:"የፊት ስፕሮኬት ከነ ፌርሞ",   price:240  },
+      { id:73, model:"HLX 125", name:"ፍላሸር",                  price:240  },
+      { id:74, model:"HLX 125", name:"27 ብሎን",               price:200  },
+      { id:75, model:"HLX 125", name:"ስፖኪዮ",                  price:620  },
+      { id:76, model:"HLX 125", name:"አሞዝራተር ሲል",           price:170  },
+      { id:77, model:"HLX 125", name:"ታይሚንግ ቼን",            price:450  },
+      { id:78, model:"HLX 125", name:"አውትፑት ሻፍት",           price:1300 },
+      { id:79, model:"HLX 125", name:"ቫልቭ",                   price:380  },
+      { id:80, model:"HLX 150", name:"ፍሬን ዘንግ",              price:150  },
+      { id:81, model:"HLX 150", name:"ስፕሮኬት ሙሉ",            price:2150 },
+      { id:82, model:"HLX 150", name:"ፓውዛ ከቨር ከነቫይዘሩ ቀይ",  price:1500 },
+      { id:83, model:"RTR 180", name:"ፍሪሲዮን ሸራ",            price:480  },
+    ]
+  },
+  {
+    name: "የ 2 እግር ዕቃዎች በቻይና",
+    items: [
+      { id:84,  model:"BM100 CC", name:"የፊት አሞዝራተር",          price:6500 },
+      { id:85,  model:"BM100 CC", name:"ዶግላ",                    price:190  },
+      { id:86,  model:"BM100 CC", name:"መጋጫ",                   price:1000 },
+      { id:87,  model:"BM100 CC", name:"ፈረፋንጎ",                 price:1400 },
+      { id:88,  model:"BM100 CC", name:"ፍሬን ዘንግ",               price:130  },
+      { id:89,  model:"BM100 CC", name:"ጌጅ",                     price:1300 },
+      { id:90,  model:"BM100 CC", name:"ስፕሮኬት ማሰሪያ",           price:1000 },
+      { id:91,  model:"BM100 CC", name:"27 ብሎን",                price:140  },
+      { id:92,  model:"BM100 CC", name:"ፍሪሲዮን ካቦ",             price:200  },
+      { id:93,  model:"BM100 CC", name:"የውጭ ማርሽ",               price:270  },
+      { id:94,  model:"BM100 CC", name:"ፍሬን ቦንዳ",               price:140  },
+      { id:95,  model:"BM150 CC", name:"የፊት አሞዝራተር",          price:6500 },
+      { id:96,  model:"BM150 CC", name:"ፍሬን ሸራ ባጃጅ",          price:300  },
+      { id:97,  model:"BM150 CC", name:"መሪ ጠጠር",               price:400  },
+      { id:98,  model:"BM150 CC", name:"መጋጫ",                   price:1000 },
+      { id:99,  model:"BM150 CC", name:"ፍሬን ዘንግ",               price:130  },
+      { id:100, model:"BM150 CC", name:"ፉት ሬስት ሙሉ ከነ ጎሚኒ",    price:1000 },
+      { id:101, model:"BM150 CC", name:"ጌጅ",                     price:1300 },
+      { id:102, model:"BM150 CC", name:"ስፖኪዮ",                   price:550  },
+      { id:103, model:"BM150 CC", name:"መርገጫ ጎሚኒ",             price:200  },
+      { id:104, model:"BM150 CC", name:"ታምቡር ጎሚኒ",            price:200  },
+      { id:105, model:"5 ማርሽ",   name:"ጌጅ",                     price:1600 },
+      { id:106, model:"BM150 CC", name:"ካቴና መወጠሪያ",            price:200  },
+      { id:107, model:"BM150 CC", name:"የውጭ ማርሽ",               price:270  },
+      { id:108, model:"BM150 CC", name:"ካቴና 122",               price:620  },
+      { id:109, model:"BM150 CC", name:"ፍሬን ካቦ",                price:200  },
+      { id:110, model:"BM150 CC", name:"ነዳጅ ካቦ",                price:200  },
+      { id:111, model:"BM150 CC", name:"ፍሪሲዮን ካቦ",             price:200  },
+      { id:112, model:"BM150 CC", name:"ሌቨር",                    price:260  },
+      { id:113, model:"BM150 CC", name:"ሆልደር",                   price:270  },
+      { id:114, model:"BM150 CC", name:"ፍሬን ቦንዳ",               price:140  },
+      { id:115, model:"BM150 CC", name:"ፍሬቻ",                    price:180  },
+      { id:116, model:"HLX125",   name:"መጋጫ",                   price:1400 },
+      { id:117, model:"HLX125",   name:"ዶግላ",                    price:260  },
+      { id:118, model:"HLX125",   name:"ፉት ሬስት ሙሉ ከነ ጎሚኒ",    price:1500 },
+      { id:119, model:"HLX125",   name:"ፍሬቻ",                    price:180  },
+      { id:120, model:"HLX125",   name:"ሆልደር",                   price:270  },
+      { id:121, model:"HLX125",   name:"የውጭ ማርሽ",               price:270  },
+      { id:122, model:"HLX 150",  name:"ካቴና 124",               price:620  },
+      { id:123, model:"HLX150",   name:"ጌጅ",                     price:1550 },
+      { id:124, model:"—",        name:"ንፋስ መከላከያ በከለር",        price:250  },
+    ]
+  },
+  {
+    name: "ኩሽኔቶች በ APPO Brand",
+    items: [
+      { id:125, model:"APPO", name:"ኩሽኔት 6200",  price:90  },
+      { id:126, model:"APPO", name:"ኩሽኔት 6202",  price:100 },
+      { id:127, model:"APPO", name:"ኩሽኔት 6301",  price:100 },
+      { id:128, model:"APPO", name:"ኩሽኔት 6302",  price:100 },
+      { id:129, model:"APPO", name:"ኩሽኔት 6004",  price:100 },
+      { id:130, model:"APPO", name:"ኩሽኔት 6205",  price:170 },
+    ]
+  },
+  {
+    name: "ባትሪዎች በ AMCO Brand",
+    items: [
+      { id:131, model:"AMCO", name:"ባትሪ 5 አምፒር",  price:2350 },
+      { id:132, model:"AMCO", name:"ባትሪ 9 አምፒር",  price:3800 },
+    ]
+  },
+  {
+    name: "የ 2 እግር ዕቃዎች በኦርጅናል",
+    items: [
+      { id:133, model:"5 ማርሽ",  name:"ሞተሪኖ",             price:4900 },
+      { id:134, model:"5 ማርሽ",  name:"አሞርዛተር የኋላ",       price:2900 },
+      { id:135, model:"5 ማርሽ",  name:"ሪጉሌተር",             price:2500 },
+      { id:136, model:"5 ማርሽ",  name:"ካርብራተር",            price:5400 },
+      { id:137, model:"5 ማርሽ",  name:"ኮሎ",                 price:7900 },
+      { id:138, model:"BM150",   name:"ዊል ከለች",            price:600  },
+      { id:139, model:"BM150",   name:"ሀብ ከለች",            price:650  },
+      { id:140, model:"BM150",   name:"ቫልቭ",                price:1200 },
+      { id:141, model:"BM150",   name:"ፍሬን ሸራ",            price:740  },
+      { id:142, model:"BM150",   name:"ፊልትሮ",               price:270  },
+      { id:143, model:"BM150",   name:"ቫልቭ ሲል",            price:110  },
+      { id:144, model:"BM150",   name:"ነዳጅ ካቦ",             price:600  },
+      { id:145, model:"BM150",   name:"ታምቡር ጎሚኒ",         price:600  },
+      { id:146, model:"BM150",   name:"ፋሻ",                  price:1050 },
+      { id:147, model:"BM150",   name:"ስፕሮኬት",              price:3700 },
+      { id:148, model:"BM150",   name:"ታይሚንግ ቼን",          price:950  },
+      { id:149, model:"BM150",   name:"ቫይዘር",               price:950  },
+      { id:150, model:"BM150",   name:"ፒስተን",               price:3500 },
+      { id:151, model:"BM150",   name:"ቴስታታ ጋስኬት",        price:500  },
+      { id:152, model:"BM150",   name:"ብላንቸሪ",              price:1100 },
+      { id:153, model:"BM150",   name:"ካርብራተር",             price:5400 },
+      { id:154, model:"BM150",   name:"አሞርዛተር ሲል",         price:220  },
+      { id:155, model:"BM150",   name:"ስፖክዮ የቀኝ",          price:590  },
+      { id:156, model:"BM150",   name:"ስፖክዮ የግራ",          price:590  },
+      { id:157, model:"BM100",   name:"አሞርዛተር ሲል",         price:240  },
+      { id:158, model:"BM100",   name:"አሞርዛተር የኋላ",        price:2950 },
+      { id:159, model:"BM100",   name:"ቫልቭ ሲል",            price:115  },
+      { id:160, model:"BM100",   name:"ዊል ከለች",            price:650  },
+      { id:161, model:"BM100",   name:"ሀብ ከለች",            price:650  },
+      { id:162, model:"BM100",   name:"ታይሚንግ ቼን",          price:600  },
+      { id:163, model:"BM100",   name:"ፓውዛ አምፖል",          price:280  },
+      { id:164, model:"—",       name:"ኩሽኔት 6202",          price:420  },
+      { id:165, model:"—",       name:"ኩሽኔት 6302",          price:450  },
+      { id:166, model:"—",       name:"ኩሽኔት 6004",          price:450  },
+      { id:167, model:"—",       name:"ኩሽኔት 6203",          price:450  },
+      { id:168, model:"HLX 125", name:"ፍሬን ሸራ የኋላ",        price:720  },
+      { id:169, model:"RTR 180", name:"ፍሬን ሸራ የኋላ",        price:1300 },
+    ]
+  },
+  {
+    name: "የ 3 እግር ዕቃዎች በቻይና",
+    items: [
+      { id:170, model:"RE COM",   name:"ፍሬን ሸራ ኢንዱራንስ",               price:300  },
+      { id:171, model:"RE COM",   name:"ፍሬን ሸራ RE",                     price:300  },
+      { id:172, model:"TVS KING", name:"ፍሬን ሸራ TVS NEW",               price:300  },
+      { id:173, model:"TVS KING", name:"ሞተሪኖ ታች TVS",                  price:310  },
+      { id:174, model:"TVS KING", name:"ፓውዛ ሙሉ TVS",                   price:490  },
+      { id:175, model:"TVS KING", name:"ቡትስ TVS ትንሹ",                  price:65   },
+      { id:176, model:"RE COM",   name:"ክላክስ RE",                        price:300  },
+      { id:177, model:"RE COM",   name:"ቢኞኒ ሙሉ VARROC",                price:1300 },
+      { id:178, model:"RE COM",   name:"ቢኞኒ ግማሽ VARROC",               price:600  },
+      { id:179, model:"RE COM",   name:"ሞተሪኖ ከሰል VARROC",              price:100  },
+      { id:180, model:"RE COM",   name:"ኳድሮ ቁልፍ ሙሉ RE",               price:1600 },
+      { id:181, model:"RE COM",   name:"ኳድሮ ቁልፍ ነጠላ RE",              price:800  },
+      { id:182, model:"RE COM",   name:"የእጅፍ ፍሬን መጨበጫ ኮም Original",   price:330  },
+      { id:183, model:"RE COM",   name:"ዘይት ሊቨሎ ኩለር Original",         price:80   },
+      { id:184, model:"RE COM",   name:"የኋላ ማርሽ ማስገቢያ ኮም ORGINAL",     price:1600 },
+      { id:185, model:"RE COM",   name:"ፖንቴ ብሎን ORGINAL",              price:250  },
+      { id:186, model:"RE COM",   name:"የኋላ በር ዳዶ ከነ ብሎኑ CHINA",       price:35   },
+    ]
+  }
+];
+
+// ─── STATE ───────────────────────────────────────────────────────
+const quantities = {}; // id -> qty
+
+// ─── INIT TELEGRAM ───────────────────────────────────────────────
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
+
+// ─── BUILD UI ────────────────────────────────────────────────────
+function groupByModel(items) {
+  const groups = {};
+  items.forEach(item => {
+    if (!groups[item.model]) groups[item.model] = [];
+    groups[item.model].push(item);
+  });
+  return groups;
+}
+
+function buildUI() {
+  const container = document.getElementById('products-container');
+  CATEGORIES.forEach((cat, ci) => {
+    const block = document.createElement('div');
+    block.className = 'category-block';
+
+    const header = document.createElement('div');
+    header.className = 'category-header';
+    header.innerHTML = `
+      <div class="category-header-left">
+        <div>
+          <h3>${cat.name}</h3>
+        </div>
+        <span class="count">${cat.items.length} ዓይነት</span>
+      </div>
+      <div class="chevron" id="chevron-${ci}"></div>
+    `;
+    header.onclick = () => toggleCategory(ci);
+
+    const body = document.createElement('div');
+    body.className = 'category-body';
+    body.id = `cat-body-${ci}`;
+
+    const groups = groupByModel(cat.items);
+    Object.entries(groups).forEach(([model, items]) => {
+      const mg = document.createElement('div');
+      mg.className = 'model-group';
+      if (model !== '—') {
+        mg.innerHTML = `<div class="model-label">📌 ${model}</div>`;
+      }
+      items.forEach(item => {
+        mg.appendChild(buildProductRow(item));
+      });
+      body.appendChild(mg);
+    });
+
+    block.appendChild(header);
+    block.appendChild(body);
+    container.appendChild(block);
+  });
+
+  // Open first category by default
+  toggleCategory(0);
+}
+
+function buildProductRow(item) {
+  const row = document.createElement('div');
+  row.className = 'product-row';
+  row.id = `row-${item.id}`;
+  row.innerHTML = `
+    <span class="product-num">${item.id}</span>
+    <div class="product-info">
+      <div class="product-name">${item.name}</div>
+      <div class="product-price">${item.price.toLocaleString()} ብር</div>
+    </div>
+    <div class="qty-control">
+      <button class="qty-btn minus" onclick="changeQty(${item.id}, -1, ${item.price})">−</button>
+      <input class="qty-input" type="number" min="0" value="0" id="qty-${item.id}"
+        onchange="setQty(${item.id}, this.value, ${item.price})"
+        oninput="setQty(${item.id}, this.value, ${item.price})"/>
+      <button class="qty-btn plus" onclick="changeQty(${item.id}, 1, ${item.price})">+</button>
+    </div>
+  `;
+  return row;
+}
+
+function toggleCategory(ci) {
+  const body = document.getElementById(`cat-body-${ci}`);
+  const chevron = document.getElementById(`chevron-${ci}`);
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+// ─── QTY LOGIC ───────────────────────────────────────────────────
+function changeQty(id, delta, price) {
+  const input = document.getElementById(`qty-${id}`);
+  let val = (quantities[id] || 0) + delta;
+  if (val < 0) val = 0;
+  quantities[id] = val;
+  input.value = val;
+  updateRow(id);
+  updateTotal();
+}
+
+function setQty(id, rawVal, price) {
+  let val = parseInt(rawVal) || 0;
+  if (val < 0) val = 0;
+  quantities[id] = val;
+  document.getElementById(`qty-${id}`).value = val;
+  updateRow(id);
+  updateTotal();
+}
+
+function updateRow(id) {
+  const row = document.getElementById(`row-${id}`);
+  if (quantities[id] > 0) row.classList.add('has-qty');
+  else row.classList.remove('has-qty');
+}
+
+function updateTotal() {
+  let total = 0;
+  CATEGORIES.forEach(cat => {
+    cat.items.forEach(item => {
+      total += (quantities[item.id] || 0) * item.price;
+    });
+  });
+  document.getElementById('grand-total').textContent =
+    total.toLocaleString() + ' ብር';
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function submitOrder() {
+  const name = document.getElementById('cust-name').value.trim();
+  const phone = document.getElementById('cust-phone').value.trim();
+
+  if (!name) { showToast('⚠️ እባክዎ ስምዎን ያስገቡ'); return; }
+  if (!phone) { showToast('⚠️ እባክዎ ስልክ ቁጥርዎን ያስገቡ'); return; }
+
+  const ordered = [];
+  CATEGORIES.forEach(cat => {
+    cat.items.forEach(item => {
+      if ((quantities[item.id] || 0) > 0) {
+        ordered.push({
+          id: item.id,
+          model: item.model,
+          name: item.name,
+          price: item.price,
+          qty: quantities[item.id],
+          subtotal: quantities[item.id] * item.price
+        });
+      }
+    });
+  });
+
+  if (ordered.length === 0) {
+    showToast('⚠️ ቢያንስ አንድ እቃ ይምረጡ');
+    return;
+  }
+
+  const total = ordered.reduce((s, i) => s + i.subtotal, 0);
+
+  const payload = {
+    customer: { name, phone },
+    items: ordered,
+    total,
+    submitted_at: new Date().toISOString()
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ እየተላከ...';
+
+  // Send to backend (Google Apps Script URL — to be configured)
+  const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwMHXQwUjpN9GTaYR4b__q_ouJmU-RcVZMMXrYnAFrJOQF_R-H6KY3ufrm0rjUjBdP4/exec';
+
+  const send = (url) => {
+    if (url && url !== 'YOUR_GOOGLE_APPS_SCRIPT_URL') {
+      return fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+    // If no backend yet, simulate success
+    return new Promise(res => setTimeout(res, 800));
+  };
+
+  send(BACKEND_URL)
+    .then(() => {
+      // Also notify via Telegram if available
+      if (tg && tg.sendData) {
+        try { tg.sendData(JSON.stringify(payload)); } catch(e) {}
+      }
+      document.getElementById('success-msg').innerHTML =
+        `<strong>${name}</strong> — ትዕዛዝዎ ደርሷል!<br/>
+         <span style="color:#E65100;font-weight:700">${total.toLocaleString()} ብር</span><br/><br/>
+         በቅርቡ እናነጋግርዎታለን 📞`;
+      document.getElementById('success-overlay').classList.add('show');
+      if (tg && tg.close) setTimeout(() => tg.close(), 3000);
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.textContent = '📤 ትዕዛዝ ላክ';
+      showToast('❌ ችግር ተፈጠረ። እንደገና ይሞክሩ');
+    });
+}
+
+// ─── START ───────────────────────────────────────────────────────
+buildUI();
+</script>
+</body>
+</html>
